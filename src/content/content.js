@@ -1,20 +1,25 @@
-alert("hello world!");
 import Vue from 'vue';
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { faCoffee } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import App from './App';
 
-global.browser = require('webextension-polyfill');
-const { name } = require('~/manifest.json')
+library.add(faCoffee);
+Vue.component('fa-icon', FontAwesomeIcon);
 
-document.addEventListener('DOMContentLoaded', e => {
-    const siderbar = document.createElement("div");
-    siderbar.className = `${name}-siderbar`
-    document.body.appendChild(siderbar);
-    console.log(1)
+global.browser = require('webextension-polyfill');
+
+document.addEventListener(
+  'DOMContentLoaded',
+  e => {
+    const div = document.createElement('div');
+    document.body.appendChild(div);
 
     /* eslint-disable no-new */
     new Vue({
-        el: siderbar,
-        render: h => h(App),
+      el: div,
+      render: h => h(App),
     });
-}, false);
-
+  },
+  false
+);

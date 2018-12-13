@@ -1,19 +1,27 @@
 <template>
-  <div>
-    Siderbar
-  </div>
+  <sidebar :width="sidebar.width">
+    <template slot="header">
+      header
+    </template>
+
+    <template>
+      sidebar
+    </template>
+  </sidebar>
 </template>
 
 <script>
-import store from '@utils/store';
+import Sidebar from './components/Sidebar';
 
 export default {
-  name: 'App'
+  name: 'App',
+  data() {
+    return {
+      sidebar: { width: 340 },
+    };
+  },
+  components: { Sidebar },
 };
 </script>
 
-<style scoped>
-p {
-  font-size: 20px;
-}
-</style>
+<style lang="scss"></style>
