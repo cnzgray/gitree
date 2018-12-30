@@ -1,5 +1,5 @@
 <template>
-  <sidebar v-if="sidebar.show" :width="sidebar.width">
+  <sidebar v-if="sidebar.show" v-loading="sidebar.loading" :width="sidebar.width">
     <component slot="header" :is="headerComponent" :repo="gitrepo"></component>
     <template>
       <el-tree
