@@ -1,27 +1,110 @@
 <template>
-  <sidebar :width="sidebar.width">
-    <template slot="header">
-      header
-    </template>
-
+  <sidebar v-if="sidebar.show" :width="sidebar.width">
+    <component slot="header" :is="headerComponent" :repo="gitrepo"></component>
     <template>
-      sidebar
+      <el-tree :data="treedata" :props="defaultProps" :highlight-current="true" @node-click="nodeClick">
+        <component
+          slot-scope="{ node, data }"
+          :is="nodeComponent"
+          :repo="gitrepo"
+          :node="node"
+          :data="data"
+        ></component>
+      </el-tree>
     </template>
   </sidebar>
 </template>
 
 <script>
-import Sidebar from './components/Sidebar';
+import Sidebar from './components/Sidebar.vue'
+import { createAdapter } from './adapter'
+import $ from 'jquery'
+import 'jquery-pjax'
 
 export default {
   name: 'App',
   data() {
     return {
-      sidebar: { width: 340 },
-    };
+      sidebar: { width: 340, show: false, loading: false },
+      treedata: [],
+      defaultProps: {
+        children: 'children'
+      },
+      adapter: null,
+      gitrepo: null
+    }
+  },
+  computed: {
+    headerComponent() {
+      if (this.adapter && this.gitrepo) return this.adapter.HeaderComponent
+    },
+    nodeComponent() {
+      if (this.adapter && this.gitrepo) return this.adapter.NodeComponent
+    }
+  },
+  created() {
+    // 创建adapter
+    createAdapter()
+      .then(adapter => {
+        this.adapter = adapter
+        return adapter.parseRepo()
+      })
+      .then(repo => {
+        this.gitrepo = repo
+        this.sidebar.show = true
+        this.sidebar.loading = true
+        return this.adapter.loadCodeTree((this.gitrepo = repo))
+      })
+      .then(nodes => {
+        sortNodes(nodes)
+        console.log(nodes)
+        this.treedata = nodes
+        this.sidebar.loading = false
+      })
+      .catch(error => {
+        if (error) console.warn(error.message, error)
+      })
   },
   components: { Sidebar },
-};
-</script>
+  methods: {
+    nodeClick(data, node) {
+      if (data.type !== 'blob') return
+      // this.adapter.selectFile(this.gitrepo, data)
+      $.pjax({
+        // needs full path for pjax to work with Firefox as per cross-domain-content setting
+        url: `${location.protocol}//${location.host}${data.href}`,
+        container: this.adapter.PjaxContentSelector,
+        timeout: 0 // global timeout doesn't seem to work, use this instead
+      })
+    }
+  }
+}
 
-<style lang="scss"></style>
+function sortNodes(nodes) {
+  nodes.sort((a, b) => {
+    if (a.type === b.type) return a.text === b.text ? 0 : a.text < b.text ? -1 : 1
+    return a.type === 'blob' ? 1 : -1
+  })
+
+  nodes.forEach(item => {
+    if (item.type === 'tree' && item.children !== true && item.children.length > 0) {
+      sortNodes(item.children)
+    }
+  })
+}
+</script>
+<style src="./components/octicon.scss" scoped></style>
+<style lang="scss">
+.gitree-sidebar {
+  .el-tree-node__content > * {
+    flex: none; // 保持元素的默认尺寸
+  }
+  .el-tree {
+    display: inline-block; // 让tree的宽度适配内容宽度
+    min-width: 100%; // 默认宽度
+  }
+  a {
+    text-decoration: none;
+  }
+}
+</style>

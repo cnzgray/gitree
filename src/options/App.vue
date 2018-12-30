@@ -1,108 +1,68 @@
 <template>
-  <div>
-    <div>
-      <h2>Github Config</h2>
-      <div>
-        <div>
-          <label>Access Token</label>
-        </div>
-        <input type="text" v-model="github.accessKey" placeholder="Access Token">
-      </div>
-      <div>
-        <div>
-          <label>GitHub Enterprise URLs</label>
-        </div>
-        <textarea
-          rows="5"
-          cols="40"
-          v-model="githubUrls"
-          placeholder="https://git.your_site1
-https://git.your_site2"
-        ></textarea>
-      </div>
-    </div>
-
-    <div>
-      <h2>Gitea Config</h2>
-      <div>
-        <div>
-          <label>Access Token</label>
-        </div>
-        <input type="text" v-model="gitea.accessKey" placeholder="Access Token">
-      </div>
-      <div>
-        <div>
-          <label>Gitea Self Host URLs</label>
-        </div>
-        <textarea
-          rows="5"
-          cols="40"
-          v-model="giteaUrls"
-          placeholder="https://git.your_site1
-https://git.your_site2"
-        ></textarea>
-      </div>
-    </div>
-    <button @click="save">保存</button>
-  </div>
+  <el-tabs v-if="loaded" active-name="github">
+    <el-tab-pane label="GITHUB" name="github">
+      <el-form label-position="top" label-width="80px">
+        <el-form-item label="Github配置"><el-input type="textarea" v-model="profiles.github"></el-input></el-form-item>
+        <el-form-item>
+          <el-button type="primary" @click="saveProfile('github', profiles.github)">save</el-button>
+        </el-form-item>
+      </el-form>
+    </el-tab-pane>
+    <el-tab-pane label="GITEA" name="gitea">
+      <el-form label-position="top" label-width="80px">
+        <el-form-item label="Gitea配置"><el-input type="textarea" v-model="profiles.gitea"></el-input></el-form-item>
+        <el-form-item>
+          <el-button type="primary" @click="saveProfile('gitea', profiles.gitea)">save</el-button>
+        </el-form-item>
+      </el-form>
+    </el-tab-pane>
+    <el-tab-pane label="GOGS" name="gogs">gogs</el-tab-pane>
+  </el-tabs>
 </template>
 
 <script>
-import store from '@utils/store';
+import { GithubStore, GiteaStore } from '@/store'
 
 export default {
   name: 'App',
   data() {
     return {
-      github: { accessKey: null, urls: [] },
-      gitea: { accessKey: null, urls: [] },
-    };
-  },
-  computed: {
-    githubUrls: {
-      get() {
-        return this.github.urls.join('\n');
-      },
-      set(value) {
-        this.github.urls = value.split('\n');
-      },
-    },
-    giteaUrls: {
-      get() {
-        return this.gitea.urls.join('\n');
-      },
-      set(value) {
-        this.gitea.urls = value.split('\n');
-      },
-    },
+      loaded: false,
+      profiles: {
+        github: '',
+        gitea: ''
+      }
+    }
   },
   created() {
-    this.github = store.tryGet('github', () => this.$data.github);
-    this.gitea = store.tryGet('gitea', () => this.$data.gitea);
+    // 还原所有的Profiles
+    this.restoreProfiles()
   },
   methods: {
-    save() {
-      store.set('github', { accessKey: this.github.accessKey, urls: this.github.urls });
-      store.set('gitea', { accessKey: this.gitea.accessKey, urls: this.gitea.urls });
-      this.requestPermission();
-      alert('save success!');
-      // chrome.runtime.sendMessage({ type: 'requestPermissions', urls: [`${this.github.accessKey}/*`] }, granted => {
-      //   console.log(granted);
-      // });
+    restoreProfiles() {
+      Promise.all([GithubStore.loadData(), GiteaStore.loadData()]).then(([github, gitea]) => {
+        this.profiles.github = JSON.stringify(github || { accessKey: '', urls: [] })
+        this.profiles.gitea = JSON.stringify(gitea || [{ accessKey: '', url: '' }])
+        this.loaded = true
+      })
     },
-    requestPermission() {
-      const urls = [].concat(this.github.urls).concat(this.gitea.urls);
-      chrome.runtime.sendMessage({ type: 'requestPermissions', urls: urls }, granted => {
-        // console.log(granted);
-        alert(granted)
-      });
-    },
-  },
-};
-</script>
-
-<style scoped>
-p {
-  font-size: 20px;
+    saveProfile(type, value) {
+      const save = () => {
+        switch (type) {
+          case 'github':
+            return GithubStore.saveData(JSON.parse(value))
+          case 'gitea':
+            return GiteaStore.saveData(JSON.parse(value))
+        }
+      }
+      save()
+        .then(() => alert('save success!'))
+        .then(() => Promise.all([GithubStore.loadData(), GiteaStore.loadData()]))
+        .then(([github, gitea]) => {
+          const urls = [].concat(github.urls).concat(gitea.map(v => v.url))
+          chrome.runtime.sendMessage('requestPermissions', { urls })
+        })
+    }
+  }
 }
-</style>
+</script>

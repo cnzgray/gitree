@@ -1,0 +1,83 @@
+.gitree-sidebar {
+  position: fixed !important;
+  top: 0;
+  right: 0;
+  left: 0;
+  bottom: 0;
+  z-index: 1000001;
+  transition: transform 0.2s ease;
+  transform: translate3d(-100%, 0, 0);
+
+  background-color: #fff;
+  border-right: 1px solid #e1e4e8;
+
+  a.toggle {
+    width: 30px;
+    height: 30px;
+    padding: 6px !important;
+    background-color: #eff3f6;
+    background-image: linear-gradient(-180deg, #fafbfc, #eff3f6 90%);
+
+    -moz-appearance: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    -webkit-appearance: none;
+    -webkit-user-select: none;
+    appearance: none;
+    background-position: -1px -1px;
+    background-repeat: repeat-x;
+    background-size: 110% 110%;
+    border: 1px solid rgba(27, 31, 35, 0.2);
+    border-radius: 0.25em;
+    cursor: pointer;
+    display: inline-block;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 20px;
+    padding: 6px 12px;
+    position: relative;
+    user-select: none;
+    vertical-align: middle;
+    white-space: nowrap;
+
+    position: absolute !important;
+    text-align: center;
+    line-height: 1;
+    cursor: pointer;
+    z-index: 1000003;
+    top: 12px;
+    right: -35px;
+  }
+
+  .views {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+
+    .view-header {
+      width: 100%;
+      font-size: 16px;
+      text-shadow: 0 1px 0 #fff;
+      z-index: 1000002;
+      background-color: #fafbfc;
+      border-bottom: 1px solid rgb(225, 228, 232);
+      padding-left: 13px;
+      padding-bottom: 8px;
+      padding-top: 8px;
+    }
+
+    .view-body {
+      overflow: auto;
+      flex: 1;
+    }
+  }
+}
+
+html.gitree-sidebar-show .gitree-sidebar {
+  transform: translate3d(0, 0, 0);
+
+  a.toggle {
+    right: 12px;
+    top: 12px;
+  }
+}

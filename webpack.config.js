@@ -1,111 +1,135 @@
-const webpack = require('webpack');
-const ejs = require('ejs');
-const path = require('path');
-const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-const WebpackShellPlugin = require('webpack-shell-plugin');
-const CopyWebpackPlugin = require('copy-webpack-plugin');
-const ChromeExtensionReloader = require('webpack-chrome-extension-reloader');
-const { VueLoaderPlugin } = require('vue-loader');
-const { version } = require('./package.json');
+const webpack = require('webpack')
+const ejs = require('ejs')
+const path = require('path')
+const MiniCssExtractPlugin = require('mini-css-extract-plugin')
+const WebpackShellPlugin = require('webpack-shell-plugin')
+const CopyWebpackPlugin = require('copy-webpack-plugin')
+const { VueLoaderPlugin } = require('vue-loader')
+const { version } = require('./package.json')
 
-const config = {
-  mode: process.env.NODE_ENV,
-  context: __dirname + '/src',
-  entry: {
-    'background': './background.js',
-    'options/options': './options/options.js',
-    'content/content': './content/content.js',
-  },
-  output: {
-    path: __dirname + '/dist',
-    filename: '[name].js',
-  },
-  resolve: {
-    alias: {
-      '~': path.resolve(__dirname, 'src/'),
-      '@utils': path.resolve(__dirname, 'src/utils/')
+const entries = {
+  background: ['./background'],
+  'options/options': ['./configure-webpack', './options/options'],
+  'content/content': ['./configure-webpack', './content/content']
+}
+
+const webpackConfigs = Object.keys(entries).map(key => {
+  entry = entries[key]
+
+  const config = {
+    mode: process.env.NODE_ENV,
+    context: path.resolve(__dirname, 'src/'),
+    entry: { [key]: entry },
+    output: {
+      path: path.resolve(__dirname, 'dist'),
+      filename: '[name].js'
     },
-    extensions: ['.js', '.vue'],
-  },
-  module: {
-    rules: [
-      {
-        test: /\.vue$/,
-        loaders: 'vue-loader',
+    resolve: {
+      alias: {
+        '@': path.resolve(__dirname, 'src/')
       },
-      {
-        test: /\.js$/,
-        loader: 'babel-loader',
-        exclude: /node_modules/,
-      },
-      {
-        test: /\.css$/,
-        use: [MiniCssExtractPlugin.loader, 'css-loader'],
-      },
-      {
-        test: /\.scss$/,
-        use: [MiniCssExtractPlugin.loader, 'css-loader', 'sass-loader'],
-      },
-      {
-        test: /\.sass$/,
-        use: [MiniCssExtractPlugin.loader, 'css-loader', 'sass-loader?indentedSyntax'],
-      },
-      {
-        test: /\.(png|jpg|gif|svg|ico)$/,
-        loader: 'file-loader',
-        options: {
-          name: '[name].[ext]?emitFile=false',
+      extensions: ['.js', '.ts', '.vue']
+    },
+    module: {
+      rules: [
+        {
+          test: /\.vue$/,
+          loaders: 'vue-loader'
         },
-      },
-    ],
-  },
-  plugins: [
-    new VueLoaderPlugin(),
-    new MiniCssExtractPlugin({
-      filename: '[name].css',
-    }),
-    new CopyWebpackPlugin([
-      { from: 'icons', to: 'icons', ignore: ['icon.xcf'] },
-      { from: 'options/options.html', to: 'options/options.html', transform: transformHtml },
-      {
-        from: 'manifest.json',
-        to: 'manifest.json',
-        transform: content => {
-          const jsonContent = JSON.parse(content);
-          jsonContent.version = version;
-
-          if (config.mode === 'development') {
-            jsonContent['content_security_policy'] = "script-src 'self' 'unsafe-eval'; object-src 'self'";
+        {
+          test: /\.(js)$/,
+          loader: 'babel-loader',
+          exclude: /node_modules/
+        },
+        {
+          test: /\.(ts)$/,
+          loader: 'babel-loader',
+          exclude: /node_modules/,
+          options: {
+            plugins: ['@babel/plugin-transform-typescript']
           }
-
-          return JSON.stringify(jsonContent, null, 2);
         },
-      },
-    ]),
-    new WebpackShellPlugin({
-      onBuildEnd: ['node scripts/remove-evals.js'],
-    }),
-  ],
-};
+        {
+          test: /\.css$/,
+          use: ['vue-style-loader', 'css-loader']
+        },
+        {
+          test: /\.scss$/,
+          use: ['vue-style-loader', 'css-loader', 'sass-loader?']
+          // TODO: 使用transform-loader对文件进行处理，替换资源文本路径
+        },
+        {
+          test: /\.sass$/,
+          use: ['vue-style-loader', 'css-loader', 'sass-loader?indentedSyntax']
+        },
+        {
+          test: /\.(png|jpg|gif|ico|svg)$/,
+          loader: 'url-loader',
+          options: {
+            name: '[name].[ext]?emitFile=false'
+          }
+        },
+        {
+          test: /\.(eot|[ot]tf|woff2?)(\?v=\d+\.\d+\.\d+)?$/,
+          loader: 'file-loader'
+        }
+      ]
+    },
+    plugins: [
+      new VueLoaderPlugin(),
+      new MiniCssExtractPlugin({
+        filename: '[name].css'
+      }),
+      new CopyWebpackPlugin([
+        { from: 'icons', to: 'icons', ignore: ['icon.xcf'] },
+        { from: 'options/options.html', to: 'options/options.html', transform: transformHtml },
+        {
+          from: 'manifest.json',
+          to: 'manifest.json',
+          transform: content => {
+            const jsonContent = JSON.parse(content)
+            jsonContent.version = version
 
-if (config.mode === 'production') {
-  config.plugins = (config.plugins || []).concat([
-    new webpack.DefinePlugin({
-      'process.env': {
-        NODE_ENV: '"production"',
-      },
-    }),
-  ]);
-}
+            if (config.mode === 'development') {
+              jsonContent['content_security_policy'] = "script-src 'self' 'unsafe-eval'; object-src 'self'"
+            }
 
-if (process.env.HMR === 'true') {
-  config.plugins = (config.plugins || []).concat([new ChromeExtensionReloader()]);
-}
+            return JSON.stringify(jsonContent, null, 2)
+          }
+        }
+      ]),
+      new WebpackShellPlugin({
+        onBuildEnd: ['node scripts/remove-evals.js']
+      })
+    ]
+  }
+
+  if (key !== 'background') {
+    config.plugins = (config.plugins || []).concat([
+      new webpack.DllReferencePlugin({
+        context: __dirname,
+        manifest: require('./manifest.vender.json')
+      })
+    ])
+  }
+
+  if (config.mode === 'production') {
+    config.plugins = (config.plugins || []).concat([
+      new webpack.DefinePlugin({
+        'process.env': {
+          NODE_ENV: '"production"'
+        }
+      })
+    ])
+  }
+
+  return config
+})
 
 function transformHtml(content) {
   return ejs.render(content.toString(), {
-    ...process.env,
-  });
+    ...process.env
+  })
 }
 
-module.exports = config;
+module.exports = webpackConfigs
