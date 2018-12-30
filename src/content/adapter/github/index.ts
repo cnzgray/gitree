@@ -108,4 +108,12 @@ export class GithubAdaptor implements IAdapter {
   loadCodeTree(repo: GitRepo, node?: GitNode): Promise<GitNode[]> {
     return requestCodeTree(repo, node, this.profile.accessKey)
   }
+
+  detectCurrentPath() {
+    const path = decodeURIComponent(location.pathname)
+    const match = path.match(/(?:[^\/]+\/){4}(.*)/)
+    if (!match) return
+
+    return match[1]
+  }
 }

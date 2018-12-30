@@ -2,7 +2,14 @@
   <sidebar v-if="sidebar.show" :width="sidebar.width">
     <component slot="header" :is="headerComponent" :repo="gitrepo"></component>
     <template>
-      <el-tree :data="treedata" :props="defaultProps" :highlight-current="true" @node-click="nodeClick">
+      <el-tree
+        ref="tree"
+        :data="treedata"
+        :props="defaultProps"
+        :highlight-current="true"
+        node-key="path"
+        @node-click="nodeClick"
+      >
         <component
           slot-scope="{ node, data }"
           :is="nodeComponent"
@@ -57,8 +64,17 @@ export default {
       })
       .then(nodes => {
         sortNodes(nodes)
-        console.log(nodes)
         this.treedata = nodes
+        return this.adapter.detectCurrentPath()
+      })
+      .then(path => {
+        const $tree = this.$refs.tree
+        const currentNode = $tree.getNode(path)
+        if (currentNode) {
+          $tree.setCurrentKey(path)
+          expandNode(currentNode)
+        }
+
         this.sidebar.loading = false
       })
       .catch(error => {
@@ -91,6 +107,12 @@ function sortNodes(nodes) {
       sortNodes(item.children)
     }
   })
+}
+
+function expandNode(node) {
+  if (node.parent) expandNode(node.parent)
+  if (node.isLeaf) return
+  else node.expand()
 }
 </script>
 <style src="./components/octicon.scss" scoped></style>

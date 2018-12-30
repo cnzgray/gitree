@@ -58,9 +58,10 @@ export function requestApi<TResult = any>({ username, reponame, path, token }: G
     method: 'GET'
   }
 
-  debug('当前未使用accessKey进行API请求!')
   if (token) {
     cfg.headers = { Authorization: 'token ' + token }
+  } else {
+    debug('当前未使用accessKey进行API请求!')
   }
 
   return axios.request<TResult>(cfg).then(

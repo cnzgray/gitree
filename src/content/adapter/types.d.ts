@@ -19,6 +19,8 @@ export interface IAdapter {
   HeaderComponent: Vue.Component
   NodeComponent: Vue.Component
   PjaxContentSelector: string
+
+  detectCurrentPath(): string | undefined
 }
 
 /**
@@ -87,6 +89,9 @@ export interface GitSubmodule {
 export type GitObject = GitDiff | GitFile
 
 export type GitNode = GitObject & {
+  /**
+   *
+   */
   id: string
   text: string
   /**
