@@ -80,6 +80,11 @@ export default {
       .catch(error => {
         if (error) console.warn(error.message, error)
       })
+
+    // binding pjax event
+    $(document)
+      .on('pjax:send', () => (this.sidebar.loading = true))
+      .on('pjax:complete', () => (this.sidebar.loading = false))
   },
   components: { Sidebar },
   methods: {
