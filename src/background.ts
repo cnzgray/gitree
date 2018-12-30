@@ -25,8 +25,8 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
       if (injected) return // injected, ignore.
 
       // inject scripts
-      // chrome.tabs.insertCSS(tabId, { file: 'content/content.css', runAt: 'document_start' });
       chrome.tabs.executeScript(tabId, { file: 'vender.js', runAt: 'document_start' })
+      chrome.tabs.insertCSS(tabId, { file: 'content/content.css', runAt: 'document_start' })
       chrome.tabs.executeScript(tabId, { file: 'content/content.js', runAt: 'document_start' })
     }
   )

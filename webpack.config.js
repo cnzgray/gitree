@@ -22,7 +22,8 @@ const webpackConfigs = Object.keys(entries).map(key => {
     entry: { [key]: entry },
     output: {
       path: path.resolve(__dirname, 'dist'),
-      filename: '[name].js'
+      filename: '[name].js',
+      publicPath: 'chrome-extension://__MSG_@@extension_id__/'
     },
     resolve: {
       alias: {
@@ -51,16 +52,15 @@ const webpackConfigs = Object.keys(entries).map(key => {
         },
         {
           test: /\.css$/,
-          use: ['vue-style-loader', 'css-loader']
+          use: [MiniCssExtractPlugin.loader, 'css-loader']
         },
         {
           test: /\.scss$/,
-          use: ['vue-style-loader', 'css-loader', 'sass-loader?']
-          // TODO: 使用transform-loader对文件进行处理，替换资源文本路径
+          use: [MiniCssExtractPlugin.loader, 'css-loader', 'sass-loader?']
         },
         {
           test: /\.sass$/,
-          use: ['vue-style-loader', 'css-loader', 'sass-loader?indentedSyntax']
+          use: [MiniCssExtractPlugin.loader, 'css-loader', 'sass-loader?indentedSyntax']
         },
         {
           test: /\.(png|jpg|gif|ico|svg)$/,
