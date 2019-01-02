@@ -3,4 +3,4 @@
 /*.log
 /dist
 /dist-zip
-/manifest.vender.json
+/manifest.vender-*.json

@@ -3586,16 +3586,6 @@ isstream@~0.1.2:
   resolved "https://registry.yarnpkg.com/isstream/-/isstream-0.1.2.tgz#47e63f7af55afa6f92e1500e690eb8b8529c099a"
   integrity sha1-R+Y/evVa+m+S4VAOaQ64uFKcCZo=
 
-jquery-pjax@^2.0.1:
-  version "2.0.1"
-  resolved "https://registry.yarnpkg.com/jquery-pjax/-/jquery-pjax-2.0.1.tgz#6b3a1ba16e644e624bdcfe72eb6b3d96a846f5f2"
-  integrity sha1-azoboW5kTmJL3P5y62s9lqhG9fI=
-
-jquery@^3.3.1:
-  version "3.3.1"
-  resolved "https://registry.yarnpkg.com/jquery/-/jquery-3.3.1.tgz#958ce29e81c9790f31be7792df5d4d95fc57fbca"
-  integrity sha512-Ubldcmxp5np52/ENotGxlLe6aGMvmF4R8S6tZjsP6Knsaxd/xp3Zrh50cG93lR6nPXyUFwzN3ZSOQI0wRJNdGg==
-
 js-base64@^2.1.8, js-base64@^2.1.9:
   version "2.5.0"
   resolved "https://registry.yarnpkg.com/js-base64/-/js-base64-2.5.0.tgz#42255ba183ab67ce59a0dee640afdc00ab5ae93e"
@@ -4741,6 +4731,11 @@ pinkie@^2.0.0:
   version "2.0.4"
   resolved "https://registry.yarnpkg.com/pinkie/-/pinkie-2.0.4.tgz#72556b80cfa0d48a974e80e77248e80ed4f7f870"
   integrity sha1-clVrgM+g1IqXToDnckjoDtT3+HA=
+
+pjax@^0.2.7:
+  version "0.2.7"
+  resolved "https://registry.yarnpkg.com/pjax/-/pjax-0.2.7.tgz#83a86c6f573494ea0a70bd2dddd30ca726498d0c"
+  integrity sha512-XMIfRB0zh8f39uaW+3mNsjky14umW+dqzYkLRj6LzPru8lQ6nVb5GlL2+NC8Zv06h6tC+5XDTLQ8zqd9dR0o+g==
 
 pkg-dir@^1.0.0:
   version "1.0.0"

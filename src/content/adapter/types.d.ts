@@ -18,9 +18,10 @@ export interface IAdapter {
 
   HeaderComponent: Vue.Component
   NodeComponent: Vue.Component
-  PjaxContentSelector: string
 
   detectCurrentPath(): string | undefined
+
+  selectFile(repo: GitRepo, node?: GitNode): void
 }
 
 /**

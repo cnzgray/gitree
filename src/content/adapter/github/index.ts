@@ -2,17 +2,11 @@ import { attr, data as domData } from '@/utils/dom'
 import { normalizeUrl } from '@/utils/url'
 import { GithubProfile, GitRepo, IAdapter, GitNode } from '../types'
 import { requestApi, requestCodeTree } from './api'
-import {
-  GH_404_SEL,
-  GH_RAW_CONTENT,
-  GH_RESERVED_REPO_NAMES,
-  GH_RESERVED_USER_NAMES,
-  DEFAULT_PROFILE,
-  GH_PJAX_CONTAINER_SEL
-} from './const'
+import { GH_404_SEL, GH_RAW_CONTENT, GH_RESERVED_REPO_NAMES, GH_RESERVED_USER_NAMES, DEFAULT_PROFILE } from './const'
 import { getBranchFormCache, setBranchToCache } from '../utils/cache'
 import HeaderComponent from './Header.vue'
 import NodeComponent from './Node.vue'
+import Pjax from 'pjax'
 
 export function detectGithub(currentUrl: string, profile: GithubProfile) {
   const urls = ['https://github.com'].concat(profile.urls.map(normalizeUrl))
@@ -35,10 +29,6 @@ export class GithubAdaptor implements IAdapter {
   }
   get NodeComponent() {
     return NodeComponent
-  }
-
-  get PjaxContentSelector() {
-    return GH_PJAX_CONTAINER_SEL
   }
 
   /**
@@ -116,4 +106,32 @@ export class GithubAdaptor implements IAdapter {
 
     return match[1]
   }
+
+  selectFile(repo: GitRepo, data: GitNode): void {
+    if (pjax == null) pjax = initPjax()
+    pjax.loadUrl(`${location.protocol}//${location.host}${data.href}`)
+  }
+}
+
+let pjax: Pjax | null = null
+function initPjax() {
+  const switches = {
+    '#js-repo-pjax-container': Pjax.switches.innerHTML // default behavior
+  }
+  const pjax = new Pjax({
+    elements: '.gitree a',
+    selectors: ['#js-repo-pjax-container'],
+    switches: switches
+  })
+  const handleResponse = pjax.handleResponse.bind(pjax)
+  pjax.handleResponse = function(responseText, request, href, options) {
+    if (request.responseText.match('<html')) {
+      handleResponse(responseText, request, href, options)
+    } else {
+      // handle non-HTML response here
+      handleResponse(`<div id="js-repo-pjax-container">${responseText}</div>`, request, href, options)
+    }
+  }
+
+  return pjax
 }

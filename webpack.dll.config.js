@@ -6,7 +6,8 @@ module.exports = {
   mode: process.env.NODE_ENV,
   context: path.resolve(__dirname, 'src/'),
   entry: {
-    common: ['jquery', 'jquery-pjax', 'vue', 'octicons'],
+    // common: ['jquery', 'jquery-pjax', 'vue', 'octicons'],
+    common: ['vue', 'octicons'],
     element: ['./plugins/element.ts']
   },
   resolve: {
@@ -65,11 +66,11 @@ module.exports = {
     new MiniCssExtractPlugin({
       filename: '[name].css'
     }),
-    // for jquery plugins in vender dll
-    new webpack.ProvidePlugin({
-      $: 'jquery',
-      jQuery: 'jquery'
-    }),
+    // // for jquery plugins in vender dll
+    // new webpack.ProvidePlugin({
+    //   $: 'jquery',
+    //   jQuery: 'jquery'
+    // }),
     new webpack.DllPlugin({
       path: 'manifest.vender-[name].json',
       name: '[name]',

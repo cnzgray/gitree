@@ -25,8 +25,7 @@
 <script>
 import Sidebar from './components/Sidebar.vue'
 import { createAdapter } from './adapter'
-import $ from 'jquery'
-import 'jquery-pjax'
+import Pjax from 'pjax'
 
 export default {
   name: 'App',
@@ -82,21 +81,14 @@ export default {
       })
 
     // binding pjax event
-    $(document)
-      .on('pjax:send', () => (this.sidebar.loading = true))
-      .on('pjax:complete', () => (this.sidebar.loading = false))
+    document.addEventListener('pjax:send', () => (this.sidebar.loading = true))
+    document.addEventListener('pjax:complete', () => (this.sidebar.loading = false))
   },
   components: { Sidebar },
   methods: {
     nodeClick(data, node) {
       if (data.type !== 'blob') return
-      // this.adapter.selectFile(this.gitrepo, data)
-      $.pjax({
-        // needs full path for pjax to work with Firefox as per cross-domain-content setting
-        url: `${location.protocol}//${location.host}${data.href}`,
-        container: this.adapter.PjaxContentSelector,
-        timeout: 0 // global timeout doesn't seem to work, use this instead
-      })
+      this.adapter.selectFile(this.gitrepo, data)
     }
   }
 }

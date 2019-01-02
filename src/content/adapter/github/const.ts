@@ -17,8 +17,6 @@ export const GH_RESERVED_REPO_NAMES = ['followers', 'following', 'repositories']
 export const GH_404_SEL = '#parallax_wrapper'
 export const GH_RAW_CONTENT = 'body > pre'
 
-export const GH_PJAX_CONTAINER_SEL = '#js-repo-pjax-container, .context-loader-container, [data-pjax-container]'
-
 /**
  * 默认配置
  */
