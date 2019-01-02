@@ -108,7 +108,11 @@ const webpackConfigs = Object.keys(entries).map(key => {
     config.plugins = (config.plugins || []).concat([
       new webpack.DllReferencePlugin({
         context: __dirname,
-        manifest: require('./manifest.vender.json')
+        manifest: require('./manifest.vender-common.json')
+      }),
+      new webpack.DllReferencePlugin({
+        context: __dirname,
+        manifest: require('./manifest.vender-element.json')
       })
     ])
   }

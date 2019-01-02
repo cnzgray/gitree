@@ -6,11 +6,13 @@
     <% if (NODE_ENV === 'development') { %>
     <!-- Load some resources only in development environment -->
     <% } %>
+    <link rel="stylesheet" href="../vender/element.css" />
     <link rel="stylesheet" href="options.css" />
   </head>
   <body>
     <div id="app"></div>
-    <script src="../vender.js"></script>
+    <script src="../vender/common.js"></script>
+    <script src="../vender/element.js"></script>
     <script src="options.js"></script>
   </body>
 </html>
