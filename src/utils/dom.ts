@@ -32,3 +32,8 @@ export function attr(selector: string, key: string) {
   const element = document.querySelector<HTMLElement>(selector)
   if (element) return element.getAttribute(key)
 }
+
+export function text(selector: string) {
+  const element = document.querySelector<HTMLElement>(selector)
+  if (element) return element.textContent
+}

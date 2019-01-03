@@ -1,5 +1,9 @@
 .octicon {
-  display: inline-block;
-  vertical-align: text-top;
-  fill: currentColor;
+  display: inline-block !important;
+  vertical-align: text-top !important;
+  fill: currentColor !important;
+}
+
+.octicon::before {
+  content: none !important;
 }

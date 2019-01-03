@@ -22,6 +22,8 @@
 
 <script>
 import { GithubStore, GiteaStore } from '@/store'
+import { resolve } from 'path'
+import { rejects } from 'assert'
 
 export default {
   name: 'App',
@@ -56,12 +58,14 @@ export default {
         }
       }
       save()
-        .then(() => alert('save success!'))
         .then(() => Promise.all([GithubStore.loadData(), GiteaStore.loadData()]))
         .then(([github, gitea]) => {
           const urls = [].concat(github.urls).concat(gitea.map(v => v.url))
-          chrome.runtime.sendMessage('requestPermissions', { urls })
+          return new Promise((resolve, reject) => {
+            chrome.runtime.sendMessage({ type: 'requestPermissions', urls: urls }, granted => resolve(resolve))
+          })
         })
+        .then(() => alert('save success!'))
     }
   }
 }

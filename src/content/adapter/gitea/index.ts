@@ -1,23 +1,23 @@
-import { attr, data as domData } from '@/utils/dom'
+import { attr, data as domData, text as domText, querySelector } from '@/utils/dom'
 import { normalizeUrl } from '@/utils/url'
-import { GithubProfile, GitRepo, IAdapter, GitNode } from '../types'
+import { GiteaProfile, GitRepo, IAdapter, GitNode } from '../types'
 import { requestApi, requestCodeTree } from './api'
-import { GH_404_SEL, GH_RAW_CONTENT, GH_RESERVED_REPO_NAMES, GH_RESERVED_USER_NAMES, DEFAULT_PROFILE } from './const'
+import { GT_404_SEL, GT_RAW_CONTENT, GT_RESERVED_REPO_NAMES, GT_RESERVED_USER_NAMES, DEFAULT_PROFILE } from './const'
 import { getBranchFormCache, setBranchToCache } from '../utils/cache'
 import HeaderComponent from './Header.vue'
 import NodeComponent from './Node.vue'
 import Pjax from 'pjax'
 
-export function detectGithub(currentUrl: string, profile: GithubProfile) {
-  const urls = ['https://github.com'].concat(profile.urls.map(normalizeUrl))
-  if (urls.indexOf(currentUrl) >= 0) return new GithubAdaptor(profile)
+export function detectGitea(currentUrl: string, profiles: GiteaProfile[]) {
+  const profile = profiles.find(p => currentUrl == normalizeUrl(p.url))
+  if (profile) return new GiteaAdaptor(profile)
 }
 
-export class GithubAdaptor implements IAdapter {
+export class GiteaAdaptor implements IAdapter {
   /** Github配置 */
-  private readonly profile: GithubProfile
+  private readonly profile: GiteaProfile
 
-  constructor(profile: GithubProfile) {
+  constructor(profile: GiteaProfile) {
     this.profile = {
       ...DEFAULT_PROFILE,
       ...profile
@@ -31,7 +31,7 @@ export class GithubAdaptor implements IAdapter {
     return NodeComponent
   }
   get lazy() {
-    return false
+    return true
   }
 
   /**
@@ -42,10 +42,10 @@ export class GithubAdaptor implements IAdapter {
     const { showOnlyChangedInPR, showInNonCodePage } = this.profile
 
     // 404 page, skip
-    if (document.getElementById(GH_404_SEL)) return Promise.reject()
+    if (document.querySelector(GT_404_SEL)) return Promise.reject()
 
     // Skip raw page
-    if (document.querySelector(GH_RAW_CONTENT)) return Promise.reject()
+    if (document.querySelector(GT_RAW_CONTENT)) return Promise.reject()
 
     // (username)/(reponame)[/(type)][/(typeId)]
     const match = window.location.pathname.match(/([^\/]+)\/([^\/]+)(?:\/([^\/]+))?(?:\/([^\/]+))?/)
@@ -57,7 +57,7 @@ export class GithubAdaptor implements IAdapter {
     const typeId = match[4]
 
     // Not a repository, skip
-    if (~GH_RESERVED_USER_NAMES.indexOf(username) || ~GH_RESERVED_REPO_NAMES.indexOf(reponame)) return Promise.reject()
+    if (~GT_RESERVED_USER_NAMES.indexOf(username) || ~GT_RESERVED_REPO_NAMES.indexOf(reponame)) return Promise.reject()
 
     // Check if this is a PR and whether we should show changes
     const isPR = type === 'pull'
@@ -69,7 +69,7 @@ export class GithubAdaptor implements IAdapter {
     // Get branch by inspecting page, quite fragile so provide multiple fallbacks
     const branch =
       // Code page
-      domData('.branch-select-menu .select-menu-item.selected', 'name') ||
+      domText('div.fitted.item.choose.reference > div > div > span > strong') ||
       // Pull requests page
       ((attr('.commit-ref.base-ref', 'title') || ':').match(/:(.*)/) || [])[1] ||
       // Reuse last selected branch if exist
@@ -104,7 +104,7 @@ export class GithubAdaptor implements IAdapter {
 
   detectCurrentPath() {
     const path = decodeURIComponent(location.pathname)
-    const match = path.match(/(?:[^\/]+\/){4}(.*)/)
+    const match = path.match(/(?:[^\/]+\/){5}(.*)/)
     if (!match) return
 
     return match[1]
@@ -119,22 +119,13 @@ export class GithubAdaptor implements IAdapter {
 let pjax: Pjax | null = null
 function initPjax() {
   const switches = {
-    '#js-repo-pjax-container': Pjax.switches.innerHTML // default behavior
+    '.repository': Pjax.switches.innerHTML // default behavior
   }
   const pjax = new Pjax({
     elements: '.gitree a',
-    selectors: ['#js-repo-pjax-container'],
+    selectors: ['.repository'],
     switches: switches
   })
-  const handleResponse = pjax.handleResponse.bind(pjax)
-  pjax.handleResponse = function(responseText, request, href, options) {
-    if (request.responseText.match('<html')) {
-      handleResponse(responseText, request, href, options)
-    } else {
-      // handle non-HTML response here
-      handleResponse(`<div id="js-repo-pjax-container">${responseText}</div>`, request, href, options)
-    }
-  }
 
   return pjax
 }

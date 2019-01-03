@@ -14,6 +14,8 @@ export interface GiteaProfile {
   accessKey?: string
   /** URLs */
   url: string
+  showOnlyChangedInPR?: boolean
+  showInNonCodePage?: boolean
 }
 
 export type GiteaProfiles = GiteaProfile[]

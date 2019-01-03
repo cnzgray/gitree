@@ -7,6 +7,8 @@
         :data="treedata"
         :props="defaultProps"
         :highlight-current="true"
+        :lazy="adapter.lazy"
+        :load="lazyLoad"
         node-key="path"
         @node-click="nodeClick"
       >
@@ -26,6 +28,7 @@
 import Sidebar from './components/Sidebar.vue'
 import { createAdapter } from './adapter'
 import Pjax from 'pjax'
+import { resolve } from 'path'
 
 export default {
   name: 'App',
@@ -34,7 +37,10 @@ export default {
       sidebar: { width: 340, show: false, loading: false },
       treedata: [],
       defaultProps: {
-        children: 'children'
+        children: 'children',
+        isLeaf(data, node) {
+          return data.type !== 'tree'
+        }
       },
       adapter: null,
       gitrepo: null
@@ -59,7 +65,7 @@ export default {
         this.gitrepo = repo
         this.sidebar.show = true
         this.sidebar.loading = true
-        return this.adapter.loadCodeTree((this.gitrepo = repo))
+        return this.adapter.loadCodeTree(repo)
       })
       .then(nodes => {
         sortNodes(nodes)
@@ -67,11 +73,24 @@ export default {
         return this.adapter.detectCurrentPath()
       })
       .then(path => {
-        const $tree = this.$refs.tree
-        const currentNode = $tree.getNode(path)
-        if (currentNode) {
-          $tree.setCurrentKey(path)
-          expandNode(currentNode)
+        if (path) {
+          const $tree = this.$refs.tree
+          const currentNode = $tree.getNode(path)
+          if (currentNode) {
+            $tree.setCurrentKey(path)
+            currentNode.expand(null, true)
+          } else {
+            breakPath(path)
+              .map(path => resolve => {
+                const node = $tree.getNode(path)
+                if (node && node.isLeaf === false) node.expand(resolve)
+                else resolve()
+              })
+              .reduce((promiseChain, currentFunction) => {
+                return promiseChain.then(() => new Promise(currentFunction))
+              }, Promise.resolve())
+              .then(() => $tree.setCurrentKey(path))
+          }
         }
 
         this.sidebar.loading = false
@@ -89,6 +108,13 @@ export default {
     nodeClick(data, node) {
       if (data.type !== 'blob') return
       this.adapter.selectFile(this.gitrepo, data)
+    },
+    lazyLoad(node, resolve) {
+      if (this.sidebar.loading) return
+      this.adapter.loadCodeTree(this.gitrepo, node.data).then(nodes => {
+        sortNodes(nodes)
+        resolve(nodes)
+      })
     }
   }
 }
@@ -106,15 +132,17 @@ function sortNodes(nodes) {
   })
 }
 
-function expandNode(node) {
-  if (node.parent) expandNode(node.parent)
-  if (node.isLeaf) return
-  else node.expand()
+// converts ['a/b'] to ['a', 'a/b']
+function breakPath(fullPath) {
+  return fullPath.split('/').reduce((res, path, idx) => {
+    res.push(idx === 0 ? path : res[idx - 1] + '/' + path)
+    return res
+  }, [])
 }
 </script>
-<style src="./components/octicon.scss" scoped></style>
 <style lang="scss">
 .gitree-sidebar {
+  @import url('./components/octicon.scss');
   .el-tree-node__content > * {
     flex: none; // 保持元素的默认尺寸
   }

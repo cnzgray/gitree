@@ -18,9 +18,22 @@ export interface IAdapter {
 
   HeaderComponent: Vue.Component
   NodeComponent: Vue.Component
+  /**
+   * 是否为懒加载
+   */
+  lazy: boolean
 
+  /**
+   * 检测当前的文件路径
+   */
   detectCurrentPath(): string | undefined
 
+  /**
+   * 选择节点
+   *
+   * @param repo 仓库信息
+   * @param node 节点信息
+   */
   selectFile(repo: GitRepo, node?: GitNode): void
 }
 
