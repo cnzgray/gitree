@@ -78,7 +78,7 @@ export default {
           const currentNode = $tree.getNode(path)
           if (currentNode) {
             $tree.setCurrentKey(path)
-            currentNode.expand(null, true)
+            if (currentNode.isLeaf === false) currentNode.expand(null, true)
           } else {
             breakPath(path)
               .map(path => resolve => {
