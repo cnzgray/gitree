@@ -142,7 +142,8 @@ function breakPath(fullPath) {
 </script>
 <style lang="scss">
 .gitree-sidebar {
-  @import url('./components/octicon.scss');
+  @import './components/octicon.scss';
+
   .el-tree-node__content > * {
     flex: none; // 保持元素的默认尺寸
   }
