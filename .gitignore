@@ -211,3 +211,4 @@ typings/
 
 /dist
 manifest.vender-*.json
+!typings/
