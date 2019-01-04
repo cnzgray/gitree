@@ -42,6 +42,7 @@ chrome.runtime.onMessage.addListener((request, _sender, sendResponse) => {
 const messageHandlers: MessageHandlers = {
   requestPermissions: (request, sendResponse) => {
     const urls = (request.urls || [])
+      .filter(url => url)
       .filter(url => url.trim() !== '')
       .map(url => {
         if (url.slice(-2) === '/*') return url

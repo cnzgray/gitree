@@ -34,7 +34,6 @@
     "@babel/preset-env": "^7.1.0",
     "@types/chrome": "^0.0.76",
     "@types/deepmerge": "^2.2.0",
-    "@types/jquery.pjax": "^0.0.30",
     "@types/node": "^10.12.18",
     "archiver": "^3.0.0",
     "babel-eslint": "^10.0.1",

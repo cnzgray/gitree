@@ -664,29 +664,10 @@
   resolved "https://registry.yarnpkg.com/@types/filewriter/-/filewriter-0.0.28.tgz#c054e8af4d9dd75db4e63abc76f885168714d4b3"
   integrity sha1-wFTor02d11205jq8dviFFocU1LM=
 
-"@types/jquery.pjax@^0.0.30":
-  version "0.0.30"
-  resolved "https://registry.yarnpkg.com/@types/jquery.pjax/-/jquery.pjax-0.0.30.tgz#9e591c64b8ac2772e1fd326e95b5b2ee0fef46c9"
-  integrity sha512-f94NqZspVBEinj7SAuiJMBeCQo07Ok7QSNgF1QuubvKQRZZ9O8vv5Krpr6l4tMzc8oPPh+UmCEVznrodP3iwMw==
-  dependencies:
-    "@types/jquery" "*"
-
-"@types/jquery@*":
-  version "3.3.29"
-  resolved "https://registry.yarnpkg.com/@types/jquery/-/jquery-3.3.29.tgz#680a2219ce3c9250483722fccf5570d1e2d08abd"
-  integrity sha512-FhJvBninYD36v3k6c+bVk1DSZwh7B5Dpb/Pyk3HKVsiohn0nhbefZZ+3JXbWQhFyt0MxSl2jRDdGQPHeOHFXrQ==
-  dependencies:
-    "@types/sizzle" "*"
-
 "@types/node@^10.12.18":
   version "10.12.18"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-10.12.18.tgz#1d3ca764718915584fcd9f6344621b7672665c67"
   integrity sha512-fh+pAqt4xRzPfqA6eh3Z2y6fyZavRIumvjhaCL753+TVkGKGhpPeyrJG2JftD0T9q4GF00KjefsQ+PQNDdWQaQ==
-
-"@types/sizzle@*":
-  version "2.3.2"
-  resolved "https://registry.yarnpkg.com/@types/sizzle/-/sizzle-2.3.2.tgz#a811b8c18e2babab7d542b3365887ae2e4d9de47"
-  integrity sha512-7EJYyKTL7tFR8+gDbB6Wwz/arpGa0Mywk1TJbNzKzHtzbwVmY4HR9WqS5VV7dsBUKQmPNr192jHr/VpBluj/hg==
 
 "@vue/component-compiler-utils@^2.0.0":
   version "2.3.1"

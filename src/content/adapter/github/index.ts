@@ -9,7 +9,7 @@ import NodeComponent from './Node.vue'
 import Pjax from 'pjax'
 
 export function detectGithub(currentUrl: string, profile: GithubProfile) {
-  const urls = ['https://github.com'].concat(profile.urls.map(normalizeUrl))
+  const urls = ['https://github.com'].concat((profile.urls || []).map(normalizeUrl))
   if (urls.indexOf(currentUrl) >= 0) return new GithubAdaptor(profile)
 }
 
