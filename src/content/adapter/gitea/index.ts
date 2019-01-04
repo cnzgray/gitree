@@ -119,12 +119,15 @@ export class GiteaAdaptor implements IAdapter {
 let pjax: Pjax | null = null
 function initPjax() {
   const switches = {
-    '.non-diff-file-content': Pjax.switches.innerHTML // default behavior
+    '#repo-files-table, .non-diff-file-content': Pjax.switches.outerHTML, // default behavior
+    '.repo-path': Pjax.switches.innerHTML, // default behavior
+    '.ui.segment.sub-menu': Pjax.switches.innerHTML, // default behavior
+    '.header-wrapper': Pjax.switches.innerHTML // default behavior
   }
   const pjax = new Pjax({
     elements: '.gitree a',
-    selectors: ['.non-diff-file-content', '.repo-path', '.segment', '.header-wrapper']
-    // switches: switches
+    selectors: Object.keys(switches),
+    switches: switches
   })
 
   return pjax
