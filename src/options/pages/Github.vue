@@ -1,7 +1,10 @@
 <template>
   <div v-loading="loading">
     <el-form label-width="200px" class="form">
-      <el-form-item label="Access Key"><el-input v-model="profile.accessKey"></el-input></el-form-item>
+      <el-form-item label="Access Key">
+        <el-input v-model="profile.accessKey" placeholder="Your Github Access Key"></el-input>
+        <a style="color:red" href="https://github.com/settings/tokens">Generate Access Key</a>
+      </el-form-item>
       <el-form-item v-for="(url, index) in profile.urls" :label="`Enterprise URL ${index + 1}`" :key="index">
         <el-input v-model="profile.urls[index]" placeholder="https://your_site"></el-input>
         <el-button @click.prevent="removeUrl(index)">删除</el-button>
@@ -17,6 +20,7 @@
 <script>
 import { GithubStore } from '@/store'
 import { requestPermissions } from '../message'
+import { DEFAULT_GITHUB_PROFILE } from '../const'
 
 export default {
   data() {
@@ -32,7 +36,10 @@ export default {
   methods: {
     restoreProfile() {
       GithubStore.loadData().then(profile => {
-        this.profile = profile || {}
+        this.profile = {
+          ...DEFAULT_GITHUB_PROFILE,
+          ...profile
+        }
         this.loading = false
       })
     },
@@ -57,7 +64,6 @@ export default {
 <style lang="scss" scoped>
 .form {
   &.el-form {
-    width: 800px;
   }
   .el-input {
     width: 500px;

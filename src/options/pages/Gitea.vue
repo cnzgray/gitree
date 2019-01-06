@@ -6,7 +6,9 @@
         <el-form-item label="Gitea Url">
           <el-input v-model="profile.url" placeholder="https://your_site"></el-input>
         </el-form-item>
-        <el-form-item label="Access Key"><el-input v-model="profile.accessKey"></el-input></el-form-item>
+        <el-form-item label="Access Key">
+          <el-input v-model="profile.accessKey" placeholder="Your Gitea Access Key"></el-input>
+        </el-form-item>
         <el-form-item><el-button @click.prevent="removeProfile(index)">删除</el-button></el-form-item>
       </el-form>
     </div>
@@ -21,6 +23,7 @@
 <script>
 import { GiteaStore } from '@/store'
 import { requestPermissions } from '../message'
+import { DEFAULT_GITEA_PROFILE } from '../const'
 
 export default {
   data() {
@@ -49,10 +52,7 @@ export default {
         })
     },
     addProfile() {
-      this.profiles.push({
-        accessKey: '',
-        url: ''
-      })
+      this.profiles.push({ ...DEFAULT_GITEA_PROFILE })
     },
     removeProfile(index) {
       if (index !== -1) this.profiles.splice(index, 1)
