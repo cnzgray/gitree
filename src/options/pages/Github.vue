@@ -32,7 +32,7 @@ export default {
   methods: {
     restoreProfile() {
       GithubStore.loadData().then(profile => {
-        this.profile = profile
+        this.profile = profile || {}
         this.loading = false
       })
     },

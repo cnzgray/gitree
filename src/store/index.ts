@@ -10,7 +10,7 @@ class Storage<T> {
         else {
           const value = items[this.storageKey]
           if (value) resolve(value)
-          else resolve({} as T)
+          else resolve()
         }
       })
     })
