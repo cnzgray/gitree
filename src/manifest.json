@@ -1,7 +1,6 @@
 {
   "name": "gitree",
   "description": "a chrome extension for view github code tree.",
-  "version": "0.0.1",
   "manifest_version": 2,
   "icons": {
     "48": "icons/icon_48.png",

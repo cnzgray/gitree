@@ -14,7 +14,7 @@ const entries = {
 }
 
 const webpackConfigs = Object.keys(entries).map(key => {
-  entry = entries[key]
+  const entry = entries[key]
 
   const config = {
     mode: process.env.NODE_ENV,
@@ -88,7 +88,13 @@ const webpackConfigs = Object.keys(entries).map(key => {
           to: 'manifest.json',
           transform: content => {
             const jsonContent = JSON.parse(content)
-            jsonContent.version = version
+            const versions = version.split('-')
+            jsonContent.version = versions[0]
+            const buildDate = new Date()
+              .toISOString()
+              .split('T')[0]
+              .replace(/-/g, '')
+            jsonContent.version_name = `v${version}(build ${buildDate})`
 
             if (config.mode === 'development') {
               jsonContent['content_security_policy'] = "script-src 'self' 'unsafe-eval'; object-src 'self'"
