@@ -1,74 +1,28 @@
 <template>
-  <el-tabs v-if="loaded" active-name="github">
-    <el-tab-pane label="GITHUB" name="github">
-      <el-form label-position="top" label-width="80px">
-        <el-form-item label="Github配置"><el-input type="textarea" v-model="profiles.github"></el-input></el-form-item>
-        <el-form-item>
-          <el-button type="primary" @click="saveProfile('github', profiles.github)">save</el-button>
-        </el-form-item>
-      </el-form>
-    </el-tab-pane>
-    <el-tab-pane label="GITEA" name="gitea">
-      <el-form label-position="top" label-width="80px">
-        <el-form-item label="Gitea配置"><el-input type="textarea" v-model="profiles.gitea"></el-input></el-form-item>
-        <el-form-item>
-          <el-button type="primary" @click="saveProfile('gitea', profiles.gitea)">save</el-button>
-        </el-form-item>
-      </el-form>
-    </el-tab-pane>
-    <el-tab-pane label="GOGS" name="gogs">gogs</el-tab-pane>
-  </el-tabs>
+  <el-row>
+    <el-col :span="16" :offset="4">
+      <el-tabs active-name="github" class="options">
+        <el-tab-pane label="GITHUB" name="github"><github></github></el-tab-pane>
+        <el-tab-pane label="GITEA" name="gitea"></el-tab-pane>
+        <el-tab-pane label="GOGS" name="gogs">暂不支持</el-tab-pane>
+        <el-tab-pane label="OSCHINA/GITEE" name="oschina">暂不支持</el-tab-pane>
+        <el-tab-pane label="GITLAB" name="gitlab">暂不支持</el-tab-pane>
+      </el-tabs>
+    </el-col>
+  </el-row>
 </template>
 
 <script>
-import { GithubStore, GiteaStore } from '@/store'
-import { resolve } from 'path'
-import { rejects } from 'assert'
+import Github from './pages/Github.vue'
 
 export default {
   name: 'App',
-  data() {
-    return {
-      loaded: false,
-      profiles: {
-        github: '',
-        gitea: ''
-      }
-    }
-  },
-  created() {
-    // 还原所有的Profiles
-    this.restoreProfiles()
-  },
-  methods: {
-    restoreProfiles() {
-      Promise.all([GithubStore.loadData(), GiteaStore.loadData()]).then(([github, gitea]) => {
-        this.profiles.github = JSON.stringify(github || { accessKey: '', urls: [] })
-        this.profiles.gitea = JSON.stringify(gitea || [{ accessKey: '', url: '' }])
-        this.loaded = true
-      })
-    },
-    saveProfile(type, value) {
-      const save = () => {
-        switch (type) {
-          case 'github':
-            return GithubStore.saveData(JSON.parse(value))
-          case 'gitea':
-            return GiteaStore.saveData(JSON.parse(value))
-        }
-      }
-      save()
-        .then(() => Promise.all([GithubStore.loadData(), GiteaStore.loadData()]))
-        .then(([github, gitea]) => {
-          const urls = [].concat(github.urls).concat(gitea.map(v => v.url))
-          return new Promise((resolve, reject) => {
-            chrome.runtime.sendMessage({ type: 'requestPermissions', urls: urls }, granted => resolve(resolve))
-          })
-        })
-        .then(() => alert('save success!'))
-    }
-  }
+  components: { Github }
 }
 </script>
 
-<style></style>
+<style lang="scss" scoped>
+.options {
+  width: 900px;
+}
+</style>

@@ -1,6 +1,8 @@
 import Vue from 'vue'
-import { Button, Tree, Tabs, TabPane, Form, FormItem, Input, Loading } from 'element-ui'
+import { Row, Col, Button, Tree, Tabs, TabPane, Form, FormItem, Input, Loading } from 'element-ui'
 
+Vue.use(Row)
+Vue.use(Col)
 Vue.use(Button)
 Vue.use(Tree)
 Vue.use(Tabs)
