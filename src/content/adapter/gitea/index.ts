@@ -118,31 +118,10 @@ export class GiteaAdaptor implements IAdapter {
 
 let pjax: Pjax | null = null
 function initPjax() {
-  const switches = {
-    '#repo-files-table': Pjax.switches.outerHTML, // default behavior
-    '.non-diff-file-content': Pjax.switches.outerHTML, // default behavior
-    '.choose.reference~*': Pjax.switches.innerHTML, // default behavior
-    '.ui.segment.sub-menu': Pjax.switches.innerHTML, // default behavior
-    '.header-wrapper': Pjax.switches.innerHTML // default behavior
-  }
   const pjax = new Pjax({
     elements: '.gitree a',
-    selectors: Object.keys(switches),
-    switches: switches
+    selectors: ['.full', '.full ~ script']
   })
-
-  const handleResponse = pjax.handleResponse.bind(pjax)
-
-  pjax.handleResponse = function(responseText, request, href, options) {
-    if (responseText.match('id="repo-files-table"')) handleResponse(responseText, request, href, options)
-    else
-      handleResponse(
-        responseText.replace('</body>', '<div id="repo-files-table"></div></body>'), // '#repo-files-table' maybe not exists
-        request,
-        href,
-        options
-      )
-  }
 
   return pjax
 }
